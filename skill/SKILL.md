@@ -179,3 +179,17 @@ After writing each artifact, confirm to user:
 - When uncertain about a technical decision: state confidence level (alta/media/baja)
 - Never invent integrations that don't exist
 - Always prefer the simpler solution — justify complexity when you recommend it
+
+## Session start: provider check
+
+At the start of each new session or task, observe the SessionStart output:
+
+- **Active provider** shown under `⚡ PROVIDER CHECK:` — note if it's the default or an override
+- **PLAN.md detected** message → multi-phase project active. If the user is starting a *new* task
+  (not resuming), suggest switching to a cost-optimized provider:
+  - *"Estás en un proyecto multi-fase. Para esta tarea de análisis/documentación,
+    podés usar OpenRouter para ahorrar tokens. Ver ADR-006."*
+- **High context** (user mentions >50% or session feels heavy) → recommend `/clear` or provider
+  switch before the next task
+- **Never force a switch** — the suggestion is soft. If the user continues with the default, proceed
+  normally. See `docs/decisions/006-provider-switching.md` for the full decision framework.

@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '=== SESSION START ===' && (git branch --show-current 2>/dev/null || echo '(not a git repo)') && echo '' && echo '--- Recent Commits (last 5) ---' && (git log --oneline -5 2>/dev/null || echo '(no git history)') && echo '' && echo '⚡ PROVIDER CHECK:' && echo \"  Model: ${CLAUDE_MODEL:-claude-opus-4-6 (default)}\" && echo \"  Base URL: ${ANTHROPIC_BASE_URL:-https://api.anthropic.com (default)}\" && echo '' && echo '💡 TIP: High context? Consider switching provider (docs/decisions/006-provider-switching.md)'"
+            "command": "echo '=== SESSION START ===' && (git branch --show-current 2>/dev/null || echo '(not a git repo)') && echo '' && echo '--- Recent Commits (last 5) ---' && (git log --oneline -5 2>/dev/null || echo '(no git history)') && echo '' && echo '⚡ PROVIDER CHECK:' && echo \"  Model: ${CLAUDE_MODEL:-claude-opus-4-6 (default)}\" && echo \"  Base URL: ${ANTHROPIC_BASE_URL:-https://api.anthropic.com (default)}\" && echo '' && if [ -f 'PLAN.md' ]; then echo '📋 PLAN.md detected — multi-phase project active'; echo '   → New task? Consider cost-optimized provider (OpenRouter/LiteLLM)'; echo '   → Docs: docs/decisions/006-provider-switching.md'; echo ''; fi && echo '💡 TIP: High context? Consider switching provider (docs/decisions/006-provider-switching.md)'"
           }
         ]
       }

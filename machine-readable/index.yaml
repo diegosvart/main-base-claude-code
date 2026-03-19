@@ -150,6 +150,46 @@ architecture:
   decisions: "docs/decisions/"
 
 # ═══════════════════════════════════════════
+# PROVIDER SWITCHING
+# ═══════════════════════════════════════════
+provider_switching:
+  capability: true
+  mechanism: "env vars override API endpoint and key — no code changes needed"
+  env_vars:
+    ANTHROPIC_BASE_URL: "Override API endpoint (default: https://api.anthropic.com)"
+    ANTHROPIC_API_KEY: "Override API key for the selected provider"
+  config_file: ".claude/settings.local.json"
+  config_rule: "gitignored — credentials NEVER go in settings.json"
+  providers:
+    anthropic:
+      url: "https://api.anthropic.com"
+      note: "Default — no changes needed"
+    openrouter:
+      url: "https://openrouter.ai/api/v1"
+      note: "200+ models; Kimi K2 available; cost-optimized"
+    litellm:
+      url: "http://localhost:4000"
+      note: "Local proxy — run: litellm --model moonshot/kimi-k2 --port 4000"
+    azure_openai:
+      url: "https://{resource}.openai.azure.com/v1"
+      note: "Requires Azure-specific key format"
+  when_to_switch:
+    - "Anthropic token budget exhausted"
+    - "Context > 50k tokens — use cheaper model for analysis/summaries"
+    - "Cost optimization for bulk tasks (analysis, documentation)"
+  when_not_to_switch:
+    - "Primary development (agents need full Claude feature set)"
+    - "Extended thinking tasks (some providers don't support it)"
+    - "Security-sensitive operations"
+  adrs:
+    - ref: "ADR-006"
+      path: "docs/decisions/006-provider-switching.md"
+      topic: "Mechanism, configuration, provider list, trade-offs"
+    - ref: "ADR-007"
+      path: "docs/decisions/007-session-start-provider-check.md"
+      topic: "SessionStart hook, smart switching suggestions, context alerts"
+
+# ═══════════════════════════════════════════
 # CONTEXT MANAGEMENT
 # ═══════════════════════════════════════════
 context:

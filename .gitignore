@@ -1,0 +1,44 @@
+# ─── Python ────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ─── Testing & Quality ─────────────────────────
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# ─── Environment ───────────────────────────────
+.env
+.env.local
+.env.*.local
+*.env
+
+# ─── Claude Code personal ──────────────────────
+.claude/settings.local.json
+.claude/session-audit.log
+docs/phases/
+
+# ─── OS ────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── IDE ───────────────────────────────────────
+.vscode/settings.json
+.idea/
+
+# ─── Logs ──────────────────────────────────────
+*.log
+logs/

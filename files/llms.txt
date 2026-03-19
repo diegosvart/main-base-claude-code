@@ -1,0 +1,47 @@
+# main-base-claude-code
+
+> Claude Code project template with inception agent, specialized subagents, and quality-enforced workflows.
+
+## What this repo is
+
+A GitHub template that bootstraps any software project with 6 pre-configured Claude Code layers:
+an inception agent that runs structured discovery before any code is written, specialized subagents
+for different engineering domains, quality-enforced hooks, and persistent context management.
+
+## How to use this repo
+
+- To start a new project: install skill/SKILL.md globally, then run /inception "your idea"
+- To resume interrupted work: /inception --resume
+- To analyze existing repo: /inception --analyze ./path
+
+## Key files for LLMs
+
+- machine-readable/index.yaml — structured index of all agents, skills, commands, hooks
+- skill/SKILL.md — inception agent orchestrator (main entry point)
+- skill/challenge-system.md — 3-level challenge protocol
+- skill/resume-protocol.md — session recovery logic
+- skill/analyze-protocol.md — existing repo analysis
+- skill/bootstrap.md — project bootstrapping via gh CLI
+- skill/stack-selector.md — stack → skills/agents mapping
+- .claude/agents/ — 5 specialized agents
+- .claude/commands/ — slash commands for Git workflow
+- .claude/settings.json — hooks configuration
+- docs/decisions/ — Architecture Decision Records
+
+## Architecture principles
+
+- Screaming Architecture + explicit ports (not pure Hexagonal)
+- Ports mandatory when module has >1 external dependency
+- CLI over MCP always (gh CLI for git, bash for filesystem)
+- Progressive artifact generation (REQUIREMENTS → ARCHITECTURE → PLAN → CLAUDE.md)
+- Context compaction at 50%, not 95%
+
+## Primary stack target
+
+Python + FastAPI + SQLAlchemy async + Alembic + Pydantic v2
+
+## Related resources
+
+- claude-mem plugin: https://github.com/thedotmack/claude-mem (persistent memory, AGPL-3.0)
+- Claude Code Ultimate Guide: https://github.com/FlorianBruniaux/claude-code-ultimate-guide
+- Claude Code docs: https://code.claude.com/docs

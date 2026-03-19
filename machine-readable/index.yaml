@@ -1,0 +1,171 @@
+# machine-readable/index.yaml
+# Structured index for agents and LLMs — ~300 tokens
+# Purpose: agents read this to discover available tools without exploring the full repo
+
+version: "1.0.0"
+repo: "diegosvart/main-base-claude-code"
+updated: "2026-03-18"
+
+# ═══════════════════════════════════════════
+# INCEPTION AGENT — 3 modes
+# ═══════════════════════════════════════════
+inception:
+  install: "~/.claude/skills/inception/"
+  modes:
+    fresh: '/inception "brief description"'
+    resume: "/inception --resume"
+    analyze: "/inception --analyze ./path"
+  phases:
+    1: "Problem space — active listening, no proposals"
+    2: "Scope + users — proposes system type, portability question"
+    3: "Technical decisions — proposes stack with trade-offs"
+    4: "Development plan — proposes PLAN.md, challenges unrealistic priorities"
+  artifacts:
+    REQUIREMENTS.md: "written at Gate 2"
+    ARCHITECTURE.md: "written at Gate 3"
+    PLAN.md: "written at Gate 4"
+    OPEN_QUESTIONS.md: "progressive, updated at each level-3 challenge"
+    CLAUDE.md: "written at bootstrap — English synthesis"
+  challenge_levels:
+    1: "nota — low risk, comments and continues"
+    2: "trade-off — medium risk, explains cost, requests confirmation"
+    3: "bloqueo soft — high risk, requires justification before advancing"
+  language:
+    discovery: "Spanish"
+    artifacts: "English"
+
+# ═══════════════════════════════════════════
+# AGENTS
+# ═══════════════════════════════════════════
+agents:
+  - name: tl-orchestrator
+    path: .claude/agents/tl-orchestrator.md
+    always_active: true
+    role: "Coordinates, delegates to specialists, manages phase lifecycle"
+    base_skills: [new-feature, commit, create-pr, review, close-phase]
+
+  - name: architecture
+    path: .claude/agents/architecture.md
+    triggers: ["architecture", "design", "pattern", "structure", "ADR", "hexagonal", "screaming", "ports"]
+    role: "Technical decisions, ADRs, Screaming+ports pattern, portability decisions"
+    base_skills: [review]
+    knows_tools: ["Playwright", "n8n", "scraping", "Celery", "Redis"]
+
+  - name: backend
+    path: .claude/agents/backend.md
+    triggers: ["endpoint", "API", "service", "repository", "FastAPI", "SQLAlchemy", "pytest"]
+    role: "API layer, services, repositories, async patterns, TDD"
+    base_skills: [new-feature, commit]
+    stack: ["python", "fastapi", "sqlalchemy", "alembic", "pydantic"]
+
+  - name: dba
+    path: .claude/agents/dba.md
+    triggers: ["migration", "schema", "query", "index", "database", "performance", "N+1"]
+    role: "Schema design, migrations, query optimization, indexing strategy"
+    base_skills: []
+    stack: ["postgresql", "alembic", "sqlalchemy"]
+
+  - name: frontend
+    path: .claude/agents/frontend.md
+    triggers: ["UI", "component", "CSS", "React", "Vue", "accessibility", "form"]
+    role: "UI components, accessibility, styling, state management"
+    base_skills: []
+    stack: ["react", "vue", "typescript", "tailwind"]
+
+# ═══════════════════════════════════════════
+# COMMANDS (slash commands)
+# ═══════════════════════════════════════════
+commands:
+  - name: commit
+    path: .claude/commands/commit.md
+    usage: "/commit [optional message]"
+    what: "lint + format + test → conventional commit message"
+
+  - name: new-feature
+    path: .claude/commands/new-feature.md
+    usage: "/new-feature [name]"
+    what: "creates branch, spec, plan, test structure"
+
+  - name: create-pr
+    path: .claude/commands/create-pr.md
+    usage: "/create-pr [target-branch]"
+    what: "auto-description from commits, creates PR via gh CLI"
+
+  - name: review
+    path: .claude/commands/review.md
+    usage: "/review [aspect: security|types|tests|all]"
+    what: "code review focused on security, type hints, coverage"
+
+  - name: close-phase
+    path: .claude/commands/close-phase.md
+    usage: "/close-phase [phase-name]"
+    what: "updates PLAN.md, generates phase summary, lists mounted tools, prompts teardown"
+
+  - name: deploy
+    path: .claude/commands/deploy.md
+    usage: "/deploy"
+    what: "PLACEHOLDER — configure per project. disable-model-invocation: true"
+    note: "out of scope in base template"
+
+# ═══════════════════════════════════════════
+# HOOKS
+# ═══════════════════════════════════════════
+hooks:
+  base:
+    - event: SessionStart
+      action: "shows current branch + last 5 commits"
+    - event: "PostToolUse(Write)"
+      action: "runs ruff format + ruff check on written file"
+    - event: Stop
+      action: "desktop notification — task complete"
+    - event: "PostToolUse(Bash)"
+      action: "logs command for session audit"
+
+  dynamic:
+    description: "inception adds stack-specific hooks during bootstrap"
+    examples:
+      python: "mypy check on Write to .py files"
+      node: "eslint + prettier on Write to .ts/.js files"
+
+  teardown:
+    trigger: "detects merge or PR close via gh CLI"
+    action: "generates phase-summary.md, lists active tools, asks user what to unmount"
+
+# ═══════════════════════════════════════════
+# SKILLS CATALOG (base minimum per agent)
+# ═══════════════════════════════════════════
+skills_catalog: ".claude/SKILLS_CATALOG.md"
+
+# ═══════════════════════════════════════════
+# ARCHITECTURE PRINCIPLES
+# ═══════════════════════════════════════════
+architecture:
+  pattern: "Screaming + explicit ports"
+  ports_rule: "mandatory when module has >1 external dependency"
+  portability_rule: "if module must be reusable across projects → lib-grade structure"
+  file_size_limit: 400  # lines — hook warns at 300, blocks at 400
+  test_requirement: "TDD — tests written before implementation"
+  coverage_minimum: "80% on services/ and repositories/"
+  service_import_rule: "service.py never imports from infra/ directly — only via ports"
+  decisions: "docs/decisions/"
+
+# ═══════════════════════════════════════════
+# CONTEXT MANAGEMENT
+# ═══════════════════════════════════════════
+context:
+  compact_at: "50% — manual, before auto-compact fires"
+  clear_at: "between unrelated tasks"
+  memory_plugin: "claude-mem (thedotmack/claude-mem) — recommended, not included"
+  resume_strategy_a: "if claude-mem installed → mem-search for session state"
+  resume_strategy_b: "fallback → load artifacts from disk + ask user for brief"
+
+# ═══════════════════════════════════════════
+# PRINCIPLES (non-negotiable)
+# ═══════════════════════════════════════════
+principles:
+  - "CLI over MCP — gh CLI for git, bash for filesystem"
+  - "Discovery in Spanish, artifacts in English"
+  - "Progressive artifacts — one file per gate, session recoverable"
+  - "Gates are explicit — agent never advances without user confirmation"
+  - "Design is not closed until user explicitly confirms"
+  - "TL always installed — other agents optional per stack"

@@ -1,0 +1,5 @@
+{
+  "_note": "MCP servers configured by inception agent during bootstrap. Add servers here as needed.",
+  "_cli_first": "Prefer gh CLI for git operations over GitHub MCP — see docs/decisions/001-cli-over-mcp.md",
+  "mcpServers": {}
+}
